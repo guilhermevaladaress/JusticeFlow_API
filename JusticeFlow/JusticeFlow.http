@@ -1,0 +1,6 @@
+@JusticeFlow_HostAddress = http://localhost:5062
+
+GET {{JusticeFlow_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
