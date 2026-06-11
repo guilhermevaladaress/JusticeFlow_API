@@ -19,7 +19,12 @@ public class HonorariosController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int? contratoId)
     {
-        var query = _context.Honorarios.Include(h => h.Contrato).AsNoTracking();
+        var query = _context.Honorarios
+            .Include(h => h.Contrato)
+                .ThenInclude(c => c.Advogado).ThenInclude(a => a.Usuario)
+            .Include(h => h.Contrato)
+                .ThenInclude(c => c.Cliente).ThenInclude(cl => cl.Usuario)
+            .AsNoTracking();
 
         if (contratoId.HasValue)
             query = query.Where(h => h.ContratoId == contratoId.Value);
@@ -31,7 +36,13 @@ public class HonorariosController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var h = await _context.Honorarios.Include(h => h.Contrato).AsNoTracking().FirstOrDefaultAsync(h => h.Id == id);
+        var h = await _context.Honorarios
+            .Include(h => h.Contrato)
+                .ThenInclude(c => c.Advogado).ThenInclude(a => a.Usuario)
+            .Include(h => h.Contrato)
+                .ThenInclude(c => c.Cliente).ThenInclude(cl => cl.Usuario)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(h => h.Id == id);
         if (h == null) return NotFound();
         return Ok(MapResponse(h));
     }
@@ -98,6 +109,8 @@ public class HonorariosController : ControllerBase
     {
         Id             = h.Id,
         ContratoId     = h.ContratoId,
+        AdvogadoNome   = h.Contrato?.Advogado?.Usuario?.NomeCompleto ?? string.Empty,
+        ClienteNome    = h.Contrato?.Cliente?.Usuario?.NomeCompleto ?? string.Empty,
         Descricao      = h.Descricao,
         Valor          = h.Valor,
         DataVencimento = h.DataVencimento,

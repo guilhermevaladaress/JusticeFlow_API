@@ -24,8 +24,8 @@ public class UpdateContratoRequest
 public class ContratoResponse
 {
     public int Id { get; set; }
-    public string Advogado { get; set; } = string.Empty;
-    public string Cliente { get; set; } = string.Empty;
+    public string AdvogadoNome { get; set; } = string.Empty;
+    public string ClienteNome { get; set; } = string.Empty;
     public DateOnly DataAssinatura { get; set; }
     public DateOnly? DataValidade { get; set; }
     public decimal ValorHonorarios { get; set; }
@@ -52,6 +52,8 @@ public class HonorarioResponse
 {
     public int Id { get; set; }
     public int ContratoId { get; set; }
+    public string AdvogadoNome { get; set; } = string.Empty;
+    public string ClienteNome { get; set; } = string.Empty;
     public string Descricao { get; set; } = string.Empty;
     public decimal Valor { get; set; }
     public DateOnly DataVencimento { get; set; }

@@ -23,6 +23,7 @@ public class TribunaisController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var list = await _context.Tribunais.AsNoTracking().ToListAsync();

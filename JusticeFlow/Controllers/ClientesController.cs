@@ -1,6 +1,7 @@
 using JusticeFlow.Data;
 using JusticeFlow.DTOs.Clientes;
 using JusticeFlow.Models;
+using JusticeFlow.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,25 @@ public class ClientesController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly UserManager<Usuario> _userManager;
+    private readonly IBrasilApiService _brasilApi;
 
-    public ClientesController(AppDbContext context, UserManager<Usuario> userManager)
+    public ClientesController(AppDbContext context, UserManager<Usuario> userManager, IBrasilApiService brasilApi)
     {
         _context = context;
         _userManager = userManager;
+        _brasilApi = brasilApi;
+    }
+
+    /// <summary>Consulta dados de empresa via CNPJ na BrasilAPI (público).</summary>
+    [HttpGet("cnpj/{cnpj}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConsultarCnpj(string cnpj)
+    {
+        var resultado = await _brasilApi.ConsultarCnpjAsync(cnpj);
+        if (resultado == null)
+            return NotFound(new { message = "CNPJ não encontrado ou inválido." });
+
+        return Ok(resultado);
     }
 
     [HttpGet]

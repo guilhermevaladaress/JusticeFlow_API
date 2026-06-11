@@ -20,17 +20,72 @@ public class RelatoriosController : ControllerBase
     public async Task<IActionResult> Dashboard()
     {
         var hoje = DateTime.UtcNow.Date;
-        var limite7dias = DateTime.UtcNow.AddDays(7);
+        var agora = DateTime.UtcNow;
+        var limite7dias = agora.AddDays(7);
+
+        var prazosProximos = await _context.Prazos
+            .Include(p => p.Processo)
+            .Where(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias)
+            .OrderBy(p => p.DataVencimento)
+            .Take(5)
+            .Select(p => new PrazoProximoItem
+            {
+                Id              = p.Id,
+                Descricao       = p.Descricao,
+                ProcessoTitulo  = p.Processo.Titulo,
+                DataVencimento  = p.DataVencimento,
+                Status          = p.Status.ToString()
+            })
+            .ToListAsync();
+
+        var audienciasProximas = await _context.Audiencias
+            .Include(a => a.Processo)
+            .Include(a => a.TipoAudiencia)
+            .Where(a => a.DataHora >= agora && a.Status == StatusAudiencia.Agendada)
+            .OrderBy(a => a.DataHora)
+            .Take(5)
+            .Select(a => new AudienciaProximaItem
+            {
+                Id                = a.Id,
+                ProcessoTitulo    = a.Processo.Titulo,
+                TipoAudienciaNome = a.TipoAudiencia.Nome,
+                DataHora          = a.DataHora,
+                Status            = a.Status.ToString()
+            })
+            .ToListAsync();
+
+        var inicioMes = new DateTime(agora.Year, agora.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var processosRecentes = await _context.Processos
+            .Include(p => p.TipoProcesso)
+            .OrderByDescending(p => p.Id)
+            .Take(5)
+            .Select(p => new ProcessoRecenteItem
+            {
+                Id          = p.Id,
+                Numero      = p.NumeroProcesso,
+                Titulo      = p.Titulo,
+                AreaDireito = p.TipoProcesso.Nome,
+                Status      = p.Status.ToString()
+            })
+            .ToListAsync();
 
         var dashboard = new DashboardResponse
         {
-            TotalProcessosAtivos  = await _context.Processos.CountAsync(p => p.Status == StatusProcesso.Ativo),
-            TotalAudienciasHoje   = await _context.Audiencias.CountAsync(a => a.DataHora.Date == hoje && a.Status == StatusAudiencia.Agendada),
-            TotalPrazosVencendo   = await _context.Prazos.CountAsync(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias),
-            TotalDocumentos       = await _context.Documentos.CountAsync(d => d.Status == StatusDocumento.Ativo),
-            TotalClientes         = await _context.Clientes.CountAsync(),
-            TotalAdvogados        = await _context.Advogados.CountAsync(a => a.Status == StatusAdvogado.Ativo),
-            HonariosAtrasados     = await _context.Honorarios.CountAsync(h => h.Status == StatusHonorario.Atrasado)
+            ProcessosAtivos    = await _context.Processos.CountAsync(p => p.Status == StatusProcesso.Ativo),
+            AudienciasHoje     = await _context.Audiencias.CountAsync(a => a.DataHora.Date == hoje && a.Status == StatusAudiencia.Agendada),
+            PrazosVencendo     = await _context.Prazos.CountAsync(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias),
+            TotalDocumentos    = await _context.Documentos.CountAsync(d => d.Status == StatusDocumento.Ativo),
+            TotalClientes      = await _context.Clientes.CountAsync(),
+            TotalAdvogados     = await _context.Advogados.CountAsync(a => a.Status == StatusAdvogado.Ativo),
+            HonariosAtrasados  = await _context.Honorarios.CountAsync(h => h.Status == StatusHonorario.Atrasado),
+            ProcessosEncerrados = await _context.Processos.CountAsync(p => p.Status == StatusProcesso.Encerrado),
+            AudienciasMes      = await _context.Audiencias.CountAsync(a => a.DataHora >= inicioMes),
+            PrazosCumpridos    = await _context.Prazos.CountAsync(p => p.Status == StatusPrazo.Cumprido),
+            NovosClientesMes   = await _context.Clientes.CountAsync(c => c.DataCadastro >= inicioMes),
+            PrazosProximos     = prazosProximos,
+            AudienciasProximas = audienciasProximas,
+            ProcessosRecentes  = processosRecentes
         };
 
         return Ok(dashboard);

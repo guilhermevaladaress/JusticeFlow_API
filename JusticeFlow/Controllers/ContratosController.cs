@@ -96,8 +96,8 @@ public class ContratosController : ControllerBase
     private static ContratoResponse MapResponse(Contrato c) => new()
     {
         Id              = c.Id,
-        Advogado        = c.Advogado?.Usuario?.NomeCompleto ?? string.Empty,
-        Cliente         = c.Cliente?.Usuario?.NomeCompleto ?? string.Empty,
+        AdvogadoNome    = c.Advogado?.Usuario?.NomeCompleto ?? string.Empty,
+        ClienteNome     = c.Cliente?.Usuario?.NomeCompleto ?? string.Empty,
         DataAssinatura  = c.DataAssinatura,
         DataValidade    = c.DataValidade,
         ValorHonorarios = c.ValorHonorarios,

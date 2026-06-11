@@ -1,6 +1,38 @@
+using System.Text.Json.Serialization;
 using JusticeFlow.Models;
 
 namespace JusticeFlow.DTOs.Clientes;
+
+public class CnpjResponse
+{
+    public string? Cnpj { get; set; }
+
+    [JsonPropertyName("razao_social")]
+    public string? RazaoSocial { get; set; }
+
+    [JsonPropertyName("nome_fantasia")]
+    public string? NomeFantasia { get; set; }
+
+    [JsonPropertyName("situacao_cadastral")]
+    public string? SituacaoCadastral { get; set; }
+
+    [JsonPropertyName("data_situacao_cadastral")]
+    public string? DataSituacaoCadastral { get; set; }
+
+    [JsonPropertyName("natureza_juridica")]
+    public string? NaturezaJuridica { get; set; }
+
+    public string? Porte { get; set; }
+    public string? Email { get; set; }
+    public string? Telefone { get; set; }
+    public string? Logradouro { get; set; }
+    public string? Numero { get; set; }
+    public string? Complemento { get; set; }
+    public string? Bairro { get; set; }
+    public string? Municipio { get; set; }
+    public string? Uf { get; set; }
+    public string? Cep { get; set; }
+}
 
 public class ClienteResponse
 {

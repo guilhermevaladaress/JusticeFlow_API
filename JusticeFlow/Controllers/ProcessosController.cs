@@ -250,24 +250,71 @@ public class ProcessosController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("{id}/advogados")]
+    public async Task<IActionResult> GetAdvogados(int id)
+    {
+        if (!await _context.Processos.AnyAsync(p => p.Id == id))
+            return NotFound(new { mensagem = "Processo não encontrado." });
+
+        var vinculos = await _context.ProcessosAdvogado
+            .Include(pa => pa.Advogado).ThenInclude(a => a.Usuario)
+            .Where(pa => pa.ProcessoId == id)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(vinculos.Select(pa => new ProcessoAdvogadoResponse
+        {
+            AdvogadoId  = pa.AdvogadoId,
+            AdvogadoNome = pa.Advogado.Usuario.NomeCompleto,
+            NumeroOAB   = pa.Advogado.NumeroOAB,
+            TipoVinculo = pa.TipoVinculo.ToString(),
+            DataVinculo = pa.DataVinculo,
+            Ativo       = pa.Ativo
+        }));
+    }
+
+    [HttpGet("{id}/clientes")]
+    public async Task<IActionResult> GetClientes(int id)
+    {
+        if (!await _context.Processos.AnyAsync(p => p.Id == id))
+            return NotFound(new { mensagem = "Processo não encontrado." });
+
+        var vinculos = await _context.ProcessosCliente
+            .Include(pc => pc.Cliente).ThenInclude(c => c.Usuario)
+            .Where(pc => pc.ProcessoId == id)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(vinculos.Select(pc => new ProcessoClienteResponse
+        {
+            ClienteId   = pc.ClienteId,
+            ClienteNome = pc.Cliente.Usuario.NomeCompleto,
+            TipoParte   = pc.TipoParte.ToString(),
+            DataVinculo = pc.DataVinculo
+        }));
+    }
+
     private static ProcessoResponse MapResponse(Processo p) => new()
     {
-        Id             = p.Id,
-        NumeroProcesso = p.NumeroProcesso,
-        Titulo         = p.Titulo,
-        Descricao      = p.Descricao,
-        Status         = p.Status.ToString(),
-        DataAbertura   = p.DataAbertura,
+        Id               = p.Id,
+        NumeroProcesso   = p.NumeroProcesso,
+        Titulo           = p.Titulo,
+        Descricao        = p.Descricao,
+        Status           = p.Status.ToString(),
+        DataAbertura     = p.DataAbertura,
         DataEncerramento = p.DataEncerramento,
-        TipoProcesso   = p.TipoProcesso?.Nome ?? string.Empty,
-        Tribunal       = p.Tribunal?.Nome ?? string.Empty,
-        Vara           = p.Vara?.Nome,
-        Advogados      = p.ProcessosAdvogado
-                          .Where(pa => pa.Ativo)
-                          .Select(pa => pa.Advogado.Usuario.NomeCompleto)
-                          .ToList(),
-        Clientes       = p.ProcessosCliente
-                          .Select(pc => pc.Cliente.Usuario.NomeCompleto)
-                          .ToList()
+        TipoProcessoId   = p.TipoProcessoId,
+        TipoProcessoNome = p.TipoProcesso?.Nome ?? string.Empty,
+        TribunalId       = p.TribunalId,
+        TribunalNome     = p.Tribunal?.Nome ?? string.Empty,
+        VaraId           = p.VaraId,
+        VaraNome         = p.Vara?.Nome,
+        Advogados        = p.ProcessosAdvogado
+                            .Where(pa => pa.Ativo)
+                            .Select(pa => pa.Advogado.Usuario.NomeCompleto)
+                            .ToList(),
+        Clientes         = p.ProcessosCliente
+                            .Select(pc => pc.Cliente.Usuario.NomeCompleto)
+                            .ToList()
     };
 }

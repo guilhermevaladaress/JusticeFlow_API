@@ -30,7 +30,9 @@ public class AudienciaResponse
     public int Id { get; set; }
     public int ProcessoId { get; set; }
     public string NumeroProcesso { get; set; } = string.Empty;
-    public string TipoAudiencia { get; set; } = string.Empty;
+    public string ProcessoTitulo { get; set; } = string.Empty;
+    public int TipoAudienciaId { get; set; }
+    public string TipoAudienciaNome { get; set; } = string.Empty;
     public DateTime DataHora { get; set; }
     public string? Local { get; set; }
     public string? LinkVirtual { get; set; }

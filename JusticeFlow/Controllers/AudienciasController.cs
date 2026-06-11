@@ -137,14 +137,16 @@ public class AudienciasController : ControllerBase
 
     private static AudienciaResponse MapResponse(Audiencia a) => new()
     {
-        Id             = a.Id,
-        ProcessoId     = a.ProcessoId,
-        NumeroProcesso = a.Processo?.NumeroProcesso ?? string.Empty,
-        TipoAudiencia  = a.TipoAudiencia?.Nome ?? string.Empty,
-        DataHora       = a.DataHora,
-        Local          = a.Local,
-        LinkVirtual    = a.LinkVirtual,
-        Status         = a.Status.ToString(),
-        Observacoes    = a.Observacoes
+        Id                = a.Id,
+        ProcessoId        = a.ProcessoId,
+        NumeroProcesso    = a.Processo?.NumeroProcesso ?? string.Empty,
+        ProcessoTitulo    = a.Processo?.Titulo ?? string.Empty,
+        TipoAudienciaId   = a.TipoAudienciaId,
+        TipoAudienciaNome = a.TipoAudiencia?.Nome ?? string.Empty,
+        DataHora          = a.DataHora,
+        Local             = a.Local,
+        LinkVirtual       = a.LinkVirtual,
+        Status            = a.Status.ToString(),
+        Observacoes       = a.Observacoes
     };
 }

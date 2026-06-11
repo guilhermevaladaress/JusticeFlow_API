@@ -58,12 +58,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
         policy.WithOrigins(
-            "http://localhost:4200", "https://localhost:4200",
-            "http://localhost:3000", "https://localhost:3000",
-            "http://127.0.0.1:4200", "https://127.0.0.1:4200"
+            "http://localhost:5173", "https://localhost:5173",
+            "http://127.0.0.1:5173"
         )
         .AllowAnyHeader()
-        .AllowAnyMethod());
+        .AllowAnyMethod()
+        .AllowCredentials());
 });
 
 // ViaCEP HttpClient
@@ -72,8 +72,13 @@ builder.Services.AddHttpClient<IViaCepService, ViaCepService>();
 // CNJ Dados Abertos HttpClient
 builder.Services.AddHttpClient<ICnjService, CnjService>();
 
+// BrasilAPI CNPJ HttpClient
+builder.Services.AddHttpClient<IBrasilApiService, BrasilApiService>();
+
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+        opts.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
 // Swagger com suporte a JWT
 builder.Services.AddEndpointsApiExplorer();

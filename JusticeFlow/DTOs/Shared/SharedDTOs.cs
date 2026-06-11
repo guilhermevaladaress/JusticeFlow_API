@@ -63,11 +63,45 @@ public class UpdateConfiguracaoRequest
 
 public class DashboardResponse
 {
-    public int TotalProcessosAtivos { get; set; }
-    public int TotalAudienciasHoje { get; set; }
-    public int TotalPrazosVencendo { get; set; }
+    public int ProcessosAtivos { get; set; }
+    public int AudienciasHoje { get; set; }
+    public int PrazosVencendo { get; set; }
     public int TotalDocumentos { get; set; }
     public int TotalClientes { get; set; }
     public int TotalAdvogados { get; set; }
     public int HonariosAtrasados { get; set; }
+    public int ProcessosEncerrados { get; set; }
+    public int AudienciasMes { get; set; }
+    public int PrazosCumpridos { get; set; }
+    public int NovosClientesMes { get; set; }
+    public List<PrazoProximoItem> PrazosProximos { get; set; } = new();
+    public List<AudienciaProximaItem> AudienciasProximas { get; set; } = new();
+    public List<ProcessoRecenteItem> ProcessosRecentes { get; set; } = new();
+}
+
+public class ProcessoRecenteItem
+{
+    public int Id { get; set; }
+    public string Numero { get; set; } = string.Empty;
+    public string Titulo { get; set; } = string.Empty;
+    public string AreaDireito { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+}
+
+public class PrazoProximoItem
+{
+    public int Id { get; set; }
+    public string Descricao { get; set; } = string.Empty;
+    public string ProcessoTitulo { get; set; } = string.Empty;
+    public DateTime DataVencimento { get; set; }
+    public string Status { get; set; } = string.Empty;
+}
+
+public class AudienciaProximaItem
+{
+    public int Id { get; set; }
+    public string ProcessoTitulo { get; set; } = string.Empty;
+    public string TipoAudienciaNome { get; set; } = string.Empty;
+    public DateTime DataHora { get; set; }
+    public string Status { get; set; } = string.Empty;
 }

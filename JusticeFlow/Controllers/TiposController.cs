@@ -17,6 +17,7 @@ public class TiposProcessoController : ControllerBase
     public TiposProcessoController(AppDbContext context) => _context = context;
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll() =>
         Ok((await _context.TiposProcesso.AsNoTracking().ToListAsync())
             .Select(t => new TipoResponse { Id = t.Id, Nome = t.Nome, Descricao = t.Descricao }));
