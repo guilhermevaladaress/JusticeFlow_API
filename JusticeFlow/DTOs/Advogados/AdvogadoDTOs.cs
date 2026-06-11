@@ -21,3 +21,15 @@ public class UpdateAdvogadoRequest
     public StatusAdvogado? Status { get; set; }
     public string? Telefone { get; set; }
 }
+
+public class CreateAdvogadoRequest
+{
+    public string NomeCompleto { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Senha { get; set; } = string.Empty;
+    public string NumeroOAB { get; set; } = string.Empty;
+    public string UF { get; set; } = string.Empty;
+    public string? Especialidade { get; set; }
+    public string? CPF { get; set; }
+    public string? Telefone { get; set; }
+}

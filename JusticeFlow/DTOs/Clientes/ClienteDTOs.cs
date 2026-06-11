@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using JusticeFlow.Models;
 
 namespace JusticeFlow.DTOs.Clientes;
@@ -6,22 +5,10 @@ namespace JusticeFlow.DTOs.Clientes;
 public class CnpjResponse
 {
     public string? Cnpj { get; set; }
-
-    [JsonPropertyName("razao_social")]
     public string? RazaoSocial { get; set; }
-
-    [JsonPropertyName("nome_fantasia")]
     public string? NomeFantasia { get; set; }
-
-    [JsonPropertyName("situacao_cadastral")]
     public string? SituacaoCadastral { get; set; }
-
-    [JsonPropertyName("data_situacao_cadastral")]
-    public string? DataSituacaoCadastral { get; set; }
-
-    [JsonPropertyName("natureza_juridica")]
     public string? NaturezaJuridica { get; set; }
-
     public string? Porte { get; set; }
     public string? Email { get; set; }
     public string? Telefone { get; set; }

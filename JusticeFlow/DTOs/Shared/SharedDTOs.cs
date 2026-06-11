@@ -23,10 +23,19 @@ public class MovimentacaoResponse
 {
     public int Id { get; set; }
     public int ProcessoId { get; set; }
+    public string? ProcessoTitulo { get; set; }
+    public string? NumeroProcesso { get; set; }
     public string Usuario { get; set; } = string.Empty;
     public DateTime DataHora { get; set; }
     public string Descricao { get; set; } = string.Empty;
     public string Tipo { get; set; } = string.Empty;
+}
+
+public class CreateMovimentacaoRequest
+{
+    public int ProcessoId { get; set; }
+    public string Descricao { get; set; } = string.Empty;
+    public string Tipo { get; set; } = "Atualizacao";
 }
 
 public class NotificacaoResponse

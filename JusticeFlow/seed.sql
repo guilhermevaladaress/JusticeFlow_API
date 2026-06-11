@@ -1,7 +1,7 @@
 -- ================================================================
 -- JusticeFlow – seed.sql  (copiado para output pelo .csproj)
 -- Executado automaticamente no startup após SeedData.InicializarAsync
--- Data de referência: 2026-06-10 (hoje)
+-- Data de referência: 2026-06-12 (hoje)
 --
 -- KPIs resultantes no dashboard:
 --   ProcessosAtivos=10 | ProcessosEncerrados=3 | AudienciasHoje=3
@@ -268,10 +268,10 @@ BEGIN
     (@P7,  @TipoConc,  '2025-11-10 09:00:00', N'2ª Vara de Família – Sala de Mediação',  NULL, 1, N'Partes não chegaram a acordo sobre valor da pensão.'),
     (@P12, @TipoInstr, '2022-11-20 14:00:00', N'1ª Vara de Família – BH',                NULL, 1, N'Depoimentos das partes e testemunhas colhidos.'),
     (@P14, @TipoInau,  '2024-03-10 09:00:00', N'3ª Vara Criminal – SP',                  NULL, 1, N'Audiência inaugural com leitura da denúncia.'),
-    -- HOJE 2026-06-10 (AudienciasHoje=3) ----------------------------------
-    (@P5,  @TipoConc,  '2026-06-10 09:00:00', N'1ª Vara Cível Central – Sala 3',         NULL, 0, N'Segunda tentativa de conciliação com mediador nomeado.'),
-    (@P7,  @TipoInstr, '2026-06-10 14:00:00', N'2ª Vara de Família – Sala 5',            NULL, 0, N'Oitiva do alimentante e apresentação de comprovantes de renda.'),
-    (@P8,  @TipoInau,  '2026-06-10 10:30:00', N'3ª Vara Criminal – SP',                  NULL, 0, N'Audiência inaugural do processo de estelionato.'),
+    -- HOJE 2026-06-12 (AudienciasHoje=3) ----------------------------------
+    (@P5,  @TipoConc,  '2026-06-12 09:00:00', N'1ª Vara Cível Central – Sala 3',         NULL, 0, N'Segunda tentativa de conciliação com mediador nomeado.'),
+    (@P7,  @TipoInstr, '2026-06-12 14:00:00', N'2ª Vara de Família – Sala 5',            NULL, 0, N'Oitiva do alimentante e apresentação de comprovantes de renda.'),
+    (@P8,  @TipoInau,  '2026-06-12 10:30:00', N'3ª Vara Criminal – SP',                  NULL, 0, N'Audiência inaugural do processo de estelionato.'),
     -- Junho/2026 (contribuem para AudienciasMes=6) ------------------------
     (@P10, @TipoInstr, '2026-06-15 09:00:00', N'1ª Vara Cível Central – Sala 2',         NULL, 0, N'Apresentação do laudo pericial sobre cálculo do INSS.'),
     (@P13, @TipoConc,  '2026-06-20 14:00:00', N'4ª Vara de Fazenda Pública – SP',        NULL, 0, N'Reunião de conciliação com representante da empresa em recuperação.'),
@@ -304,7 +304,7 @@ BEGIN
     (@P9,  @PrazoManifest, @Adv3Id, N'Manifestação sobre proposta da incorporadora',   '2025-10-15 23:59:00', NULL, 2, N'Negociação suspensa. Processo aguardando desbloqueio.'),
     (@P14, @PrazoRecursal, @Adv3Id, N'Recurso da sentença de 1ª instância',            '2024-09-01 23:59:00', NULL, 2, N'Condenação aceita. Recurso não necessário.'),
     -- Pendentes dentro de 7 dias (2026-06-10 a 2026-06-17) ---------------
-    (@P8,  @PrazoContest,  @Adv3Id, N'Contestar a denúncia no processo de estelionato','2026-06-11 23:59:00', NULL, 0, N'URGENTE: Audiência inaugural é hoje. Contestação deve ser apresentada.'),
+    (@P8,  @PrazoContest,  @Adv3Id, N'Contestar a denúncia no processo de estelionato','2026-06-13 23:59:00', NULL, 0, N'URGENTE: Audiência inaugural é hoje. Contestação deve ser apresentada em 48h.'),
     (@P5,  @PrazoContest,  @Adv1Id, N'Apresentar contestação à defesa da ré',          '2026-06-12 23:59:00', NULL, 0, N'Após audiência de hoje, prazo começa a correr.'),
     (@P6,  @PrazoManifest, @Adv1Id, N'Manifestação sobre documentos juntados pelo réu','2026-06-14 23:59:00', NULL, 0, N'Réu juntou laudo do IML em 05/06/2026.'),
     (@P10, @PrazoRecursal, @Adv2Id, N'Recurso ao cálculo pericial do INSS',            '2026-06-16 23:59:00', NULL, 0, N'Laudo pericial publicado. Divergência de R$ 18.400.'),
@@ -369,17 +369,17 @@ BEGIN
     -- P5
     (@P5, @UsrAdv1, '2025-02-10 10:00:00', N'Ação por fraude contratual cadastrada. Documentos juntados.',                                      0),
     (@P5, @UsrAdv1, '2025-06-18 15:00:00', N'Audiência de instrução realizada. Peritos ouvidos.',                                               2),
-    (@P5, @UsrAdv1, '2026-06-10 09:30:00', N'Audiência de conciliação realizada hoje. Partes mantêm posições.',                                 2),
+    (@P5, @UsrAdv1, '2026-06-12 09:30:00', N'Audiência de conciliação realizada hoje. Partes mantêm posições.',                                 2),
     -- P6
     (@P6, @UsrAdv1, '2025-04-05 09:00:00', N'Ação de indenização por acidente de trânsito cadastrada.',                                         0),
     (@P6, @UsrAdv1, '2025-07-20 14:00:00', N'Laudo médico confirmando lesões. Juntado aos autos.',                                              1),
     -- P7
     (@P7, @UsrAdv2, '2025-05-20 08:00:00', N'Processo de revisão de pensão alimentícia distribuído à 2ª Vara de Família.',                     0),
     (@P7, @UsrAdv2, '2025-11-10 09:30:00', N'Audiência de conciliação sem acordo. Processo segue para instrução.',                             2),
-    (@P7, @UsrAdv2, '2026-06-10 14:30:00', N'Audiência de instrução realizada. Comprovantes analisados.',                                       2),
+    (@P7, @UsrAdv2, '2026-06-12 14:30:00', N'Audiência de instrução realizada. Comprovantes analisados.',                                       2),
     -- P8
     (@P8, @UsrAdv3, '2025-06-01 09:00:00', N'Processo criminal de estelionato registrado. Vítimas identificadas.',                              0),
-    (@P8, @UsrAdv3, '2026-06-10 10:30:00', N'Audiência inaugural realizada. Réu cientificado da acusação.',                                     2),
+    (@P8, @UsrAdv3, '2026-06-12 10:30:00', N'Audiência inaugural realizada. Réu cientificado da acusação.',                                     2),
     -- P9
     (@P9, @UsrAdv3, '2025-03-15 10:00:00', N'Ação de rescisão imobiliária distribuída ao TJRJ.',                                                0),
     (@P9, @UsrAdv3, '2025-11-20 09:00:00', N'Processo suspenso por 90 dias para tentativa de acordo extrajudicial.',                           5),
@@ -464,23 +464,23 @@ IF NOT EXISTS (SELECT 1 FROM Notificacoes)
 BEGIN
     INSERT INTO Notificacoes (UsuarioId, ProcessoId, Titulo, Mensagem, Tipo, Lida, DataCriacao, DataLeitura) VALUES
     -- Adv1
-    (@UsrAdv1, @P1,  N'Prazo se aproximando',           N'O prazo para manifestação no proc. 0001234 vence em 30 dias.',                                  0, 0, '2026-06-10 08:00:00', NULL),
+    (@UsrAdv1, @P1,  N'Prazo se aproximando',           N'O prazo para manifestação no proc. 0001234 vence em 30 dias.',                                  0, 0, '2026-06-12 08:00:00', NULL),
     (@UsrAdv1, @P1,  N'Audiência de instrução marcada', N'Audiência de instrução agendada para 15/08/2026 às 14h na 1ª Vara Cível Central.',              1, 1, '2026-06-01 10:00:00', '2026-06-01 10:30:00'),
-    (@UsrAdv1, @P5,  N'URGENTE: Audiência hoje',        N'Conciliação do proc. 0003579 marcada para HOJE às 09:00 na 1ª Vara Cível Central.',             1, 0, '2026-06-10 07:00:00', NULL),
-    (@UsrAdv1, @P8,  N'URGENTE: Prazo vence amanhã',    N'Contestação no proc. 0006802 (Estelionato) vence em 11/06/2026. Prepare o documento.',         0, 0, '2026-06-10 07:30:00', NULL),
+    (@UsrAdv1, @P5,  N'URGENTE: Audiência hoje',        N'Conciliação do proc. 0003579 marcada para HOJE às 09:00 na 1ª Vara Cível Central.',             1, 0, '2026-06-12 07:00:00', NULL),
+    (@UsrAdv1, @P8,  N'URGENTE: Prazo vence em 2 dias',  N'Contestação no proc. 0006802 (Estelionato) vence em 13/06/2026. Prepare o documento.',         0, 0, '2026-06-12 07:30:00', NULL),
     -- Adv2
-    (@UsrAdv2, @P7,  N'Audiência hoje – Pensão',        N'Audiência de instrução do proc. 0005791 às 14h. Compareça com os comprovantes de renda.',       1, 0, '2026-06-10 07:00:00', NULL),
-    (@UsrAdv2, @P10, N'Prazo recursal em 6 dias',       N'Prazo para recurso do cálculo pericial do INSS vence em 16/06/2026. Revise o laudo.',           0, 0, '2026-06-10 08:00:00', NULL),
+    (@UsrAdv2, @P7,  N'Audiência hoje – Pensão',        N'Audiência de instrução do proc. 0005791 às 14h. Compareça com os comprovantes de renda.',       1, 0, '2026-06-12 07:00:00', NULL),
+    (@UsrAdv2, @P10, N'Prazo recursal em 4 dias',        N'Prazo para recurso do cálculo pericial do INSS vence em 16/06/2026. Revise o laudo.',           0, 0, '2026-06-12 08:00:00', NULL),
     (@UsrAdv2, @P3,  N'Audiência de julgamento',        N'Audiência de julgamento trabalhista marcada para 22/09/2026 às 10h.',                           1, 1, '2026-06-05 09:00:00', '2026-06-05 10:00:00'),
     -- Adv3
-    (@UsrAdv3, @P8,  N'Audiência inaugural hoje',       N'Audiência inaugural do processo de Estelionato às 10:30. Chegue com 20 min de antecedência.',   1, 0, '2026-06-10 07:00:00', NULL),
-    (@UsrAdv3, @P11, N'Audiência em 15 dias',           N'Audiência inaugural da Ação Popular em 25/06/2026. Prepare documentos da licitação.',           1, 0, '2026-06-10 08:30:00', NULL),
+    (@UsrAdv3, @P8,  N'Audiência inaugural hoje',       N'Audiência inaugural do processo de Estelionato às 10:30. Chegue com 20 min de antecedência.',   1, 0, '2026-06-12 07:00:00', NULL),
+    (@UsrAdv3, @P11, N'Audiência em 13 dias',           N'Audiência inaugural da Ação Popular em 25/06/2026. Prepare documentos da licitação.',           1, 0, '2026-06-12 08:30:00', NULL),
     -- Clientes
     (@UsrCli1, @P1,  N'Atualização do seu processo',    N'Nova movimentação no processo de Danos Morais. Audiência de instrução em agosto.',              2, 0, '2026-06-01 09:00:00', NULL),
     (@UsrCli1, @P2,  N'Acordo confirmado',              N'O acordo de guarda compartilhada foi homologado. Próxima etapa: partilha de bens.',              3, 1, '2024-09-11 08:00:00', '2024-09-12 10:00:00'),
     (@UsrCli2, @P3,  N'Audiência de julgamento próxima',N'Sua audiência de julgamento trabalhista foi agendada para 22/09/2026.',                         1, 0, '2026-06-10 08:30:00', NULL),
-    (@UsrCli3, @P5,  N'Audiência hoje – sua presença',  N'Audiência de conciliação HOJE às 09:00. Sua presença pode ser solicitada pelo juiz.',           1, 0, '2026-06-10 07:00:00', NULL),
-    (@UsrCli4, @P7,  N'Audiência hoje – pensão',        N'Audiência de instrução sobre revisão de pensão alimentícia HOJE às 14:00.',                     1, 0, '2026-06-10 07:00:00', NULL),
+    (@UsrCli3, @P5,  N'Audiência hoje – sua presença',  N'Audiência de conciliação HOJE às 09:00. Sua presença pode ser solicitada pelo juiz.',           1, 0, '2026-06-12 07:00:00', NULL),
+    (@UsrCli4, @P7,  N'Audiência hoje – pensão',        N'Audiência de instrução sobre revisão de pensão alimentícia HOJE às 14:00.',                     1, 0, '2026-06-12 07:00:00', NULL),
     -- Admin
-    (@UsrAdmin, NULL, N'Sistema com dados completos',   N'JusticeFlow inicializado com 14 processos, 3 advogados e 5 clientes. Dashboard disponível.',    3, 1, '2026-06-10 00:00:00', '2026-06-10 08:00:00');
+    (@UsrAdmin, NULL, N'Sistema com dados completos',   N'JusticeFlow inicializado com 14 processos, 3 advogados e 5 clientes. Dashboard disponível.',    3, 1, '2026-06-12 00:00:00', '2026-06-12 08:00:00');
 END;

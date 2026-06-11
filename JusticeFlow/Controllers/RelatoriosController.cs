@@ -4,6 +4,7 @@ using JusticeFlow.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace JusticeFlow.Controllers;
 
@@ -22,24 +23,54 @@ public class RelatoriosController : ControllerBase
         var hoje = DateTime.UtcNow.Date;
         var agora = DateTime.UtcNow;
         var limite7dias = agora.AddDays(7);
+        var inicioMes = new DateTime(agora.Year, agora.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        var prazosProximos = await _context.Prazos
-            .Include(p => p.Processo)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var isAdmin = User.IsInRole("Administrador");
+
+        // Para advogado, busca o ID dele para filtrar apenas seus processos
+        int? advogadoId = null;
+        if (!isAdmin)
+        {
+            var adv = await _context.Advogados
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.UsuarioId == userId);
+            advogadoId = adv?.Id;
+        }
+
+        // Queries base filtradas por papel
+        IQueryable<Processo> processosQ = _context.Processos
+            .Include(p => p.ProcessosAdvogado);
+        IQueryable<Prazo> prazosQ = _context.Prazos
+            .Include(p => p.Processo).ThenInclude(p => p.ProcessosAdvogado);
+        IQueryable<Audiencia> audienciasQ = _context.Audiencias
+            .Include(a => a.Processo).ThenInclude(p => p.ProcessosAdvogado);
+        IQueryable<Documento> documentosQ = _context.Documentos
+            .Include(d => d.Processo).ThenInclude(p => p.ProcessosAdvogado);
+
+        if (advogadoId.HasValue)
+        {
+            processosQ   = processosQ.Where(p => p.ProcessosAdvogado.Any(pa => pa.AdvogadoId == advogadoId.Value && pa.Ativo));
+            prazosQ      = prazosQ.Where(p => p.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == advogadoId.Value && pa.Ativo));
+            audienciasQ  = audienciasQ.Where(a => a.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == advogadoId.Value && pa.Ativo));
+            documentosQ  = documentosQ.Where(d => d.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == advogadoId.Value && pa.Ativo));
+        }
+
+        var prazosProximos = await prazosQ
             .Where(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias)
             .OrderBy(p => p.DataVencimento)
             .Take(5)
             .Select(p => new PrazoProximoItem
             {
-                Id              = p.Id,
-                Descricao       = p.Descricao,
-                ProcessoTitulo  = p.Processo.Titulo,
-                DataVencimento  = p.DataVencimento,
-                Status          = p.Status.ToString()
+                Id             = p.Id,
+                Descricao      = p.Descricao,
+                ProcessoTitulo = p.Processo.Titulo,
+                DataVencimento = p.DataVencimento,
+                Status         = p.Status.ToString()
             })
             .ToListAsync();
 
-        var audienciasProximas = await _context.Audiencias
-            .Include(a => a.Processo)
+        var audienciasProximas = await audienciasQ
             .Include(a => a.TipoAudiencia)
             .Where(a => a.DataHora >= agora && a.Status == StatusAudiencia.Agendada)
             .OrderBy(a => a.DataHora)
@@ -54,9 +85,7 @@ public class RelatoriosController : ControllerBase
             })
             .ToListAsync();
 
-        var inicioMes = new DateTime(agora.Year, agora.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        var processosRecentes = await _context.Processos
+        var processosRecentes = await processosQ
             .Include(p => p.TipoProcesso)
             .OrderByDescending(p => p.Id)
             .Take(5)
@@ -72,20 +101,20 @@ public class RelatoriosController : ControllerBase
 
         var dashboard = new DashboardResponse
         {
-            ProcessosAtivos    = await _context.Processos.CountAsync(p => p.Status == StatusProcesso.Ativo),
-            AudienciasHoje     = await _context.Audiencias.CountAsync(a => a.DataHora.Date == hoje && a.Status == StatusAudiencia.Agendada),
-            PrazosVencendo     = await _context.Prazos.CountAsync(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias),
-            TotalDocumentos    = await _context.Documentos.CountAsync(d => d.Status == StatusDocumento.Ativo),
-            TotalClientes      = await _context.Clientes.CountAsync(),
-            TotalAdvogados     = await _context.Advogados.CountAsync(a => a.Status == StatusAdvogado.Ativo),
-            HonariosAtrasados  = await _context.Honorarios.CountAsync(h => h.Status == StatusHonorario.Atrasado),
-            ProcessosEncerrados = await _context.Processos.CountAsync(p => p.Status == StatusProcesso.Encerrado),
-            AudienciasMes      = await _context.Audiencias.CountAsync(a => a.DataHora >= inicioMes),
-            PrazosCumpridos    = await _context.Prazos.CountAsync(p => p.Status == StatusPrazo.Cumprido),
-            NovosClientesMes   = await _context.Clientes.CountAsync(c => c.DataCadastro >= inicioMes),
-            PrazosProximos     = prazosProximos,
-            AudienciasProximas = audienciasProximas,
-            ProcessosRecentes  = processosRecentes
+            ProcessosAtivos     = await processosQ.CountAsync(p => p.Status == StatusProcesso.Ativo),
+            AudienciasHoje      = await audienciasQ.CountAsync(a => a.DataHora.Date == hoje && a.Status == StatusAudiencia.Agendada),
+            PrazosVencendo      = await prazosQ.CountAsync(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite7dias),
+            TotalDocumentos     = await documentosQ.CountAsync(d => d.Status == StatusDocumento.Ativo),
+            ProcessosEncerrados = await processosQ.CountAsync(p => p.Status == StatusProcesso.Encerrado),
+            AudienciasMes       = await audienciasQ.CountAsync(a => a.DataHora >= inicioMes),
+            PrazosCumpridos     = await prazosQ.CountAsync(p => p.Status == StatusPrazo.Cumprido),
+            HonariosAtrasados   = isAdmin ? await _context.Honorarios.CountAsync(h => h.Status == StatusHonorario.Atrasado) : 0,
+            TotalClientes       = isAdmin ? await _context.Clientes.CountAsync() : 0,
+            TotalAdvogados      = isAdmin ? await _context.Advogados.CountAsync(a => a.Status == StatusAdvogado.Ativo) : 0,
+            NovosClientesMes    = isAdmin ? await _context.Clientes.CountAsync(c => c.DataCadastro >= inicioMes) : 0,
+            PrazosProximos      = prazosProximos,
+            AudienciasProximas  = audienciasProximas,
+            ProcessosRecentes   = processosRecentes
         };
 
         return Ok(dashboard);
@@ -121,9 +150,20 @@ public class RelatoriosController : ControllerBase
     [HttpGet("prazos")]
     public async Task<IActionResult> RelatorioPrazos([FromQuery] string? status)
     {
-        var query = _context.Prazos
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var isAdmin = User.IsInRole("Administrador");
+
+        IQueryable<Prazo> query = _context.Prazos
             .Include(p => p.TipoPrazo)
+            .Include(p => p.Processo).ThenInclude(p => p.ProcessosAdvogado)
             .AsNoTracking();
+
+        if (!isAdmin)
+        {
+            var adv = await _context.Advogados.AsNoTracking().FirstOrDefaultAsync(a => a.UsuarioId == userId);
+            if (adv != null)
+                query = query.Where(p => p.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == adv.Id && pa.Ativo));
+        }
 
         if (!string.IsNullOrEmpty(status) && Enum.TryParse<StatusPrazo>(status, out var statusEnum))
             query = query.Where(p => p.Status == statusEnum);
@@ -143,9 +183,20 @@ public class RelatoriosController : ControllerBase
     [HttpGet("audiencias")]
     public async Task<IActionResult> RelatorioAudiencias([FromQuery] DateTime? inicio, [FromQuery] DateTime? fim)
     {
-        var query = _context.Audiencias
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var isAdmin = User.IsInRole("Administrador");
+
+        IQueryable<Audiencia> query = _context.Audiencias
             .Include(a => a.TipoAudiencia)
+            .Include(a => a.Processo).ThenInclude(p => p.ProcessosAdvogado)
             .AsNoTracking();
+
+        if (!isAdmin)
+        {
+            var adv = await _context.Advogados.AsNoTracking().FirstOrDefaultAsync(a => a.UsuarioId == userId);
+            if (adv != null)
+                query = query.Where(a => a.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == adv.Id && pa.Ativo));
+        }
 
         if (inicio.HasValue) query = query.Where(a => a.DataHora >= inicio.Value);
         if (fim.HasValue)    query = query.Where(a => a.DataHora <= fim.Value);

@@ -53,15 +53,25 @@ public class PrazosController : ControllerBase
     [Authorize(Roles = "Administrador,Advogado")]
     public async Task<IActionResult> GetVencendo()
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var isAdmin = User.IsInRole("Administrador");
         var limite = DateTime.UtcNow.AddDays(7);
-        var list = await _context.Prazos
-            .Include(p => p.Processo)
+
+        IQueryable<Prazo> query = _context.Prazos
+            .Include(p => p.Processo).ThenInclude(p => p.ProcessosAdvogado)
             .Include(p => p.TipoPrazo)
             .Include(p => p.Advogado).ThenInclude(a => a!.Usuario)
             .Where(p => p.Status == StatusPrazo.Pendente && p.DataVencimento <= limite)
-            .AsNoTracking()
-            .ToListAsync();
+            .AsNoTracking();
 
+        if (!isAdmin)
+        {
+            var adv = await _context.Advogados.AsNoTracking().FirstOrDefaultAsync(a => a.UsuarioId == userId);
+            if (adv != null)
+                query = query.Where(p => p.Processo.ProcessosAdvogado.Any(pa => pa.AdvogadoId == adv.Id && pa.Ativo));
+        }
+
+        var list = await query.ToListAsync();
         return Ok(list.Select(p => MapResponse(p)));
     }
 

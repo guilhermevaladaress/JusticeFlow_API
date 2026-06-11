@@ -23,6 +23,44 @@ public class AdvogadosController : ControllerBase
         _userManager = userManager;
     }
 
+    [HttpPost]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Create([FromBody] CreateAdvogadoRequest req)
+    {
+        if (await _userManager.FindByEmailAsync(req.Email) != null)
+            return Conflict(new { mensagem = "E-mail já cadastrado." });
+
+        var usuario = new Usuario
+        {
+            UserName        = req.Email,
+            Email           = req.Email,
+            NomeCompleto    = req.NomeCompleto,
+            CPF             = req.CPF,
+            TelefoneContato = req.Telefone,
+            EmailConfirmed  = true
+        };
+
+        var result = await _userManager.CreateAsync(usuario, req.Senha);
+        if (!result.Succeeded)
+            return BadRequest(new { mensagem = "Falha ao criar usuário.", erros = result.Errors.Select(e => e.Description) });
+
+        await _userManager.AddToRoleAsync(usuario, "Advogado");
+
+        var advogado = new Advogado
+        {
+            UsuarioId     = usuario.Id,
+            NumeroOAB     = req.NumeroOAB,
+            UF            = req.UF,
+            Especialidade = req.Especialidade,
+            DataAdmissao  = DateOnly.FromDateTime(DateTime.UtcNow)
+        };
+
+        _context.Advogados.Add(advogado);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id = advogado.Id }, MapResponse(advogado));
+    }
+
     [HttpGet]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> GetAll()

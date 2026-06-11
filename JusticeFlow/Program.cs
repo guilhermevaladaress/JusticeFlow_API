@@ -110,9 +110,11 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed
+// Migrate + Seed
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<JusticeFlow.Data.AppDbContext>();
+    await db.Database.MigrateAsync();
     await SeedData.InicializarAsync(scope.ServiceProvider);
 }
 

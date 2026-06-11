@@ -31,11 +31,18 @@ public class ClientesController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> ConsultarCnpj(string cnpj)
     {
-        var resultado = await _brasilApi.ConsultarCnpjAsync(cnpj);
-        if (resultado == null)
-            return NotFound(new { message = "CNPJ não encontrado ou inválido." });
+        try
+        {
+            var resultado = await _brasilApi.ConsultarCnpjAsync(cnpj);
+            if (resultado == null)
+                return NotFound(new { mensagem = "CNPJ não encontrado ou inválido." });
 
-        return Ok(resultado);
+            return Ok(resultado);
+        }
+        catch (BrasilApiRateLimitException ex)
+        {
+            return StatusCode(429, new { mensagem = ex.Message });
+        }
     }
 
     [HttpGet]
